@@ -1,1 +1,3 @@
+mmh3
+bson
 redis
