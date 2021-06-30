@@ -5,7 +5,7 @@ import redis
 from rdt.serializers import ItemSerializer
 
 
-class RedisJsonLIFOQueue:
+class RedisLifoQueue:
     """Simple Last-In-First-Out queue implemented on redis list datatype"""
 
     __slots__ = [

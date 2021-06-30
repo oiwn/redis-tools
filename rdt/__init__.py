@@ -1,3 +1,3 @@
 """Top level imports"""
-from .queues import RedisJsonLIFOQueue
+from .queues import RedisLifoQueue
 from .filters import RedisSetFilter, RedisBucketFilter

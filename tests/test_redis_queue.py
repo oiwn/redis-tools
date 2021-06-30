@@ -1,8 +1,8 @@
 """Tests for queues"""
-# pylint: disable=missing-function-docstring
+# pylint: disable=missing-function-docstring,redefined-outer-name
 import redis
 
-from rdt import RedisJsonLIFOQueue
+from rdt import RedisLifoQueue
 from tests.fixtures import redis_db
 
 
@@ -10,7 +10,7 @@ rdb = redis_db  # redis fixture
 
 
 def test_redis_lifo_queue(rdb):
-    q = RedisJsonLIFOQueue("rdt:test-queue", r=rdb)
+    q = RedisLifoQueue("rdt:test-queue", r=rdb)
 
     # check db property
     assert isinstance(q.db, redis.client.Redis)
