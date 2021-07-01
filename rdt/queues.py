@@ -1,5 +1,5 @@
 """Different types of queues for redis"""
-from typing import List
+from typing import List, Dict, Optional
 
 import redis
 from rdt.serializers import ItemSerializer
@@ -62,7 +62,7 @@ class RedisLifoQueue:
         :param item: serializable item to push into the queue
         :returns: int -- the length of the list after the push operation
         """
-        return self.db.rpush(self.name, self.serializer.dumps(item))
+        return int(self.db.rpush(self.name, self.serializer.dumps(item)))
 
     def put_bulk(self, items: List[dict]) -> bool:
         """Use redis pipelines to push bulk into the queue
@@ -74,18 +74,18 @@ class RedisLifoQueue:
             pipe.rpush(self.name, self.serializer.dumps(item))
         res = pipe.execute()
         # last result contains len of queue after operations
-        return res[-1] == self.__len__()
+        return bool(res[-1] == self.__len__())
 
-    def get(self) -> dict:
+    def get(self) -> Optional[Dict]:
         """Pop first element from the list
         :returns: dict - serialized item
         """
         item = self.db.lpop(self.name)
         if item is None:
             return None
-        return self.serializer.loads(item)
+        return dict(self.serializer.loads(item))
 
-    def get_block(self, timeout=None) -> dict:
+    def get_block(self, timeout=None) -> Optional[Dict]:
         """Pop item from the queue.
 
         If optional args block is true and timeout is None (the default), block
@@ -94,13 +94,13 @@ class RedisLifoQueue:
 
         # return self.serializer.loads(item)
         if item:
-            return self.serializer.loads(item[1])
+            return dict(self.serializer.loads(item[1]))
         return None
 
     def get_bulk(self, number_of_items) -> List[dict]:
         """Remove and return part of list from queue"""
         items_list = []
-        for num in range(number_of_items):
+        for _ in range(number_of_items):
             item = self.db.lpop(self.name)
 
             if item:
@@ -114,14 +114,14 @@ class RedisLifoQueue:
 
         :returns: int -- memory used in bytes
         """
-        return self.db.memory_usage(self.name, samples=0)
+        return int(self.db.memory_usage(self.name, samples=0))
 
     def __len__(self) -> int:
         """Queue length.
 
         :returns: int -- number of elements in queue
         """
-        return self.db.llen(self.name)
+        return int(self.db.llen(self.name))
 
     def __str__(self) -> str:
         """String representation of object

@@ -1,3 +1,4 @@
+"""Fixtures for pytest dependency injections"""
 import redis
 import pytest
 
