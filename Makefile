@@ -10,9 +10,9 @@ tests:
 	py.test -v tests/ -W "ignore"
 
 coverage:
-	pytest --cov=ig tests/ -W "ignore"
+	pytest --cov=rdt tests/ -W "ignore"
 
 covreport:
-	pytest --cov=ig tests/ -W "ignore" && coverage html
+	pytest --cov=rdt tests/ -W "ignore" && coverage html
 
 

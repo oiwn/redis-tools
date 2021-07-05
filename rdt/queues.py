@@ -109,12 +109,12 @@ class RedisLifoQueue:
                 break
         return items_list
 
-    def sizeof(self) -> int:
+    def sizeof(self) -> Optional[int]:
         """Size of data structure in redis
 
         :returns: int -- memory used in bytes
         """
-        return int(self.db.memory_usage(self.name, samples=0))
+        return self.db.memory_usage(self.name, samples=0)
 
     def __len__(self) -> int:
         """Queue length.
