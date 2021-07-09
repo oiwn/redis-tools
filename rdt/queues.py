@@ -114,7 +114,7 @@ class RedisLifoQueue:
 
         :returns: int -- memory used in bytes
         """
-        return self.db.memory_usage(self.name, samples=0)
+        return int(self.db.memory_usage(self.name, samples=0))
 
     def __len__(self) -> int:
         """Queue length.
@@ -128,4 +128,4 @@ class RedisLifoQueue:
 
         :returns: str -- class, key name and Redis connection
         """
-        return "<RedisJsonLIFOQueue name={} <{}>>".format(self.name, self.db)
+        return "<RedisLifoQueue name={} <{}>>".format(self.name, self.db)
