@@ -63,5 +63,5 @@ def test_redis_lifo_queue(rdb):
     assert q.sizeof() is None
 
     # print
-    assert "RedisJsonLIFOQueue" in str(q)
+    assert "RedisLifoQueue" in str(q)
     assert "rdt:test-queue" in str(q)
