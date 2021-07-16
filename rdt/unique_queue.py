@@ -58,6 +58,11 @@ class RedisUniqueQueue:
         """
         return len(self) == 0
 
+    def in_filter(self, value: Dict) -> bool:
+        """Check if element already in filter"""
+        key = self.keygetter(value)
+        return bool(self.db.sismember(self.filter_name, key))
+
     def put(self, item: Dict) -> int:
         """Put item into the queue.
 

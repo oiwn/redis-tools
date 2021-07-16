@@ -13,7 +13,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="redis-tools",
-    version="0.0.2",
+    version="0.0.3",
     author="oiwn",
     author_email="",
     description=(

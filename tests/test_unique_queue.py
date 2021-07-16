@@ -39,6 +39,10 @@ def test_redis_unique_queue(rdb):
     # check not empty
     assert q.is_empty() is False
 
+    # check in filter
+    assert q.in_filter({"_id": 0, "bob": 1}) is True
+    assert q.in_filter({"_id": 3, "bob": 1}) is False
+
     # and len
     assert len(q) == 2
 
@@ -94,6 +98,10 @@ def test_redis_unique_queue_kegsetter(rdb):
 
     # len
     assert len(q) == 3
+
+    # check in filter
+    assert q.in_filter({"payload": {"key": "b"}, "bob": 1}) is True
+    assert q.in_filter({"payload": {"key": "d"}, "bob": 1}) is False
 
     # sizeof
     assert q.sizeof() > 0
