@@ -1,5 +1,6 @@
+# pylint: disable=missing-module-docstring
 import sys
-import setuptools
+import setuptools  # type: ignore
 
 
 if sys.version_info[:2] < (3, 6):
@@ -12,10 +13,12 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="redis-tools",
-    version="0.0.1",
+    version="0.0.2",
     author="oiwn",
     author_email="",
-    description="Various tools to simplify common use cases for redis in web-scraping",
+    description=(
+        "Various tools to simplify common use cases for redis in web-scraping"
+    ),
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/oiwn/redis-tools",
