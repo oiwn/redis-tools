@@ -92,7 +92,6 @@ class RedisLifoQueue:
         if necessary until an item is available."""
         item = self.db.blpop(self.name, timeout=timeout)
 
-        # return self.serializer.loads(item)
         if item:
             return dict(self.serializer.loads(item[1]))
         return None

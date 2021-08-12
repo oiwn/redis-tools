@@ -1,8 +1,8 @@
 """Tests for unique queue"""
 # pylint: disable=redefined-outer-name,invalid-name
-import redis
+import operator
 
-#  import pytest
+import redis
 
 from rdt.unique_queue import RedisUniqueQueue
 from tests.fixtures import redis_db
@@ -13,7 +13,9 @@ rdb = redis_db
 
 def test_redis_unique_queue(rdb):
     """Test unique queue"""
-    q = RedisUniqueQueue("rdt:test-unique-queue", r=rdb)
+    q = RedisUniqueQueue(
+        "rdt:test-unique-queue", r=rdb, keygetter=operator.itemgetter("_id")
+    )
 
     # check db property
     assert isinstance(q.db, redis.client.Redis)
@@ -110,3 +112,26 @@ def test_redis_unique_queue_kegsetter(rdb):
     assert len(q.get_bulk(2)) == 2
     assert len(q.get_bulk(10)) == 1
     assert q.is_empty() is True
+
+
+def test_redis_unique_queue_kegsetter_default_value(rdb):
+    """Test unique queue"""
+    q = RedisUniqueQueue("rdt:test-unique-queue", r=rdb)
+
+    assert q.is_empty() is True
+
+    # get from empty queue
+    assert q.get() is None
+
+    # put bulk 3 elements
+    items = ["a", "b", "c"]
+    assert q.put_bulk(items) is True
+
+    # len
+    assert len(q) == 3
+
+    # check in filter
+    assert q.in_filter("a") is True
+    assert q.in_filter("d") is False
+
+    assert q.get() == "a"

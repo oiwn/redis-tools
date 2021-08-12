@@ -1,4 +1,5 @@
 """Unique queue implementation"""
+import operator
 from typing import List, Dict, Optional, Callable, Any
 import redis
 
@@ -34,7 +35,7 @@ class RedisUniqueQueue:
         name: str,
         r: redis.client.Redis,
         serializer: str = "json",
-        keygetter: Callable[[Dict], Any] = lambda x: x["_id"],
+        keygetter: Callable[[Dict], Any] = operator.itemgetter(0),
     ):
         """Trivial LIFO redis queue implementation, with filtering
         store data as serialized json
@@ -63,7 +64,7 @@ class RedisUniqueQueue:
         key = self.keygetter(value)
         return bool(self.db.sismember(self.filter_name, key))
 
-    def put(self, item: Dict) -> int:
+    def put(self, item: Dict) -> int:  # TODO: define item type (int, str, etc)
         """Put item into the queue.
 
         :param item: serializable item to push into the queue
@@ -82,7 +83,7 @@ class RedisUniqueQueue:
         # last result contains len of queue after operations
         return int(res[-1])
 
-    def put_bulk(self, items: List[dict]) -> bool:
+    def put_bulk(self, items: List[Dict]) -> bool:
         """Use redis pipelines to push bulk into the queue
         :param items: list of serializables to push into the queue
         :returns: bool - if return fit number of items in queue
@@ -97,14 +98,14 @@ class RedisUniqueQueue:
         # last result contains len of queue after operations
         return bool(res[-1] == self.__len__())
 
-    def get(self) -> Optional[Dict]:
+    def get(self) -> Any:  # define type
         """Pop first element from the list
         :returns: dict - serialized item
         """
         item = self.db.lpop(self.queue_name)
         if item is None:
             return None
-        return dict(self.serializer.loads(item))
+        return self.serializer.loads(item)
 
     def get_block(self, timeout=None) -> Optional[Dict]:
         """Pop item from the queue.
@@ -117,7 +118,7 @@ class RedisUniqueQueue:
             return dict(self.serializer.loads(item[1]))
         return None
 
-    def get_bulk(self, number_of_items) -> List[dict]:
+    def get_bulk(self, number_of_items) -> List[Any]:
         """Remove and return part of list from queue"""
         items_list = []
         for _ in range(number_of_items):
