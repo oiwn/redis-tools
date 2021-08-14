@@ -95,6 +95,9 @@ class RedisUniqueQueue:
                 pipe.sadd(self.filter_name, key)
                 pipe.rpush(self.queue_name, self.serializer.dumps(item))
         res = pipe.execute()
+        # if all given `items` already in filter `res` will be []
+        if not res:
+            return False
         # last result contains len of queue after operations
         return bool(res[-1] == self.__len__())
 

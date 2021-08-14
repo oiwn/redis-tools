@@ -1,4 +1,6 @@
 #+TITLE: Tasks and notes
 
 * Tasks
-  - [ ] default itemgetter for unique_queue
+  - [X] default itemgetter for unique_queue
+  - [X] itemgetter could be None, if so use default (RedisUniqueQueue)
+  - [X] fix error for RedisUniqueQueue when all put_bulk items already in filter

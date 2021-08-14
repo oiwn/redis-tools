@@ -72,7 +72,7 @@ def test_redis_unique_queue(rdb):
     assert "rdt:test-unique-queue:queue" in str(q)
 
 
-def test_redis_unique_queue_kegsetter(rdb):
+def test_redis_unique_queue_keygetter(rdb):
     """Test unique queue"""
     q = RedisUniqueQueue(
         "rdt:test-unique-queue",
@@ -135,3 +135,14 @@ def test_redis_unique_queue_kegsetter_default_value(rdb):
     assert q.in_filter("d") is False
 
     assert q.get() == "a"
+
+
+def test_redis_unique_queue_bulk_items_already_in_filter(rdb):
+    """Test put_bulk of items already in filter"""
+
+    q = RedisUniqueQueue("rdt:test-unique-queue", r=rdb)
+
+    items = ["a", "b", "c"]
+
+    assert q.put_bulk(items) is True
+    assert q.put_bulk(items) is False
