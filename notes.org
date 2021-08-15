@@ -4,3 +4,6 @@
   - [X] default itemgetter for unique_queue
   - [X] itemgetter could be None, if so use default (RedisUniqueQueue)
   - [X] fix error for RedisUniqueQueue when all put_bulk items already in filter
+  - [ ] replace default keygetter to return same element by default
+  - [ ] ABC for queues
+  - [ ] RedisUniqueQueue able to define names of filter and queue separately
