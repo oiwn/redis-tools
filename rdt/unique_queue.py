@@ -1,9 +1,13 @@
 """Unique queue implementation"""
 import operator
-from typing import List, Dict, Optional, Callable, Any
+from typing import List, Dict, Optional, Callable, Union, Any
 import redis
 
 from rdt.serializers import ItemSerializer
+
+
+# operator to get same element
+Same = lambda x: x
 
 
 class RedisUniqueQueue:
@@ -32,24 +36,36 @@ class RedisUniqueQueue:
 
     def __init__(
         self,
-        name: str,
+        name: Union[str, Dict[str, str]],
         r: redis.client.Redis,
         serializer: str = "json",
-        keygetter: Callable[[Dict], Any] = operator.itemgetter(0),
+        keygetter: Callable[[Dict], Any] = Same,
     ):
         """Trivial LIFO redis queue implementation, with filtering
         store data as serialized json
 
-        :param queue_name: queue key in redis
+        :param queue_name: queue key in redis, could be a Dict with keys
+            'queue' and 'filter' keys
         :param filter_name: set key in redis
         :param r: redis client instance
         :param serializer: string representation of json library
-        :param keygetter: function to access to item key
+        :param keygetter: function to access to item key, by default return same
+            element
         """
         self.__db = r
         self.__serializer = ItemSerializer(serializer)
-        self.queue_name = f"{name}:queue"
-        self.filter_name = f"{name}:filter"
+
+        # define names for queue and filter
+        if isinstance(name, dict):
+            assert ("queue" in name) and (
+                "filter" in name
+            ), "name dict should contain 'queue' and 'filter' keys"
+            self.queue_name = name["queue"]
+            self.filter_name = name["filter"]
+        else:
+            self.queue_name = f"{name}:queue"
+            self.filter_name = f"{name}:filter"
+
         self.keygetter = keygetter
 
     def is_empty(self) -> bool:

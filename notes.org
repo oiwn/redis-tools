@@ -7,3 +7,5 @@
   - [ ] replace default keygetter to return same element by default
   - [ ] ABC for queues
   - [ ] RedisUniqueQueue able to define names of filter and queue separately
+  - [X] basic benchmarks
+  - [ ] add examples to README.md
