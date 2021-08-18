@@ -8,4 +8,5 @@
   - [ ] ABC for queues
   - [ ] RedisUniqueQueue able to define names of filter and queue separately
   - [X] basic benchmarks
-  - [ ] add examples to README.md
+  - [ ] rename RedisSetFilter to RedisFilter
+  - [X] add examples to README.md

@@ -1,35 +1,15 @@
-# redis-tools
-Various tools to simplify common use cases
-
-[![codecov](https://codecov.io/gh/oiwn/redis-tools/branch/master/graph/badge.svg)](https://codecov.io/gh/oiwn/redis-tools)
-
-
-Helpers and stuff for building web crawlers.
-
-# Installation
-
-```bash
-
-pip install git+https://github.com/oiwn/redis-tools
-```
-
-
-## Redis
-
-- `RedisSetFilter` filter based on redis set.
-- `RedisBucketFilter` filter which 'shard' values over few sets.
-- `RedisLifoQueue` LIFO queue based on redis
-- `RedisUniqueQueue` LIFO queue containing with unique elements
-
-
-### RedisSetFilter
-
-Trivial implementation of filter using redis set datatype
-
-```python
+"""Check code examples from README.me"""
+# pylint: disable=missing-function-docstring
+import operator
 
 import redis
-from pcg import RedisSetFilter
+from rdt import (
+    RedisSetFilter,
+    RedisBucketFilter,
+    RedisLifoQueue,
+    RedisUniqueQueue,
+)
+
 
 def redis_set_filter():
     db = redis.from_url("redis://localhost:6379/15")
@@ -50,18 +30,6 @@ def redis_set_filter():
 
     db.delete("rdt:set-filter")
 
-
-redis_set_filter()
-
-```
-
-### RedisBucketFilter
-
-Split filter into the buckets, based on murmur hash.
-
-```python
-import redis
-from pcg import RedisBucketFilter
 
 def redis_bucket_filter():
     db = redis.from_url("redis://localhost:6379/15")
@@ -90,18 +58,6 @@ def redis_bucket_filter():
     keys = db.keys("rdt:bucket-filter:*")
     for key in keys:
         db.delete(key)
-
-
-redis_bucket_filter()
-```
-
-### RedisLifoQueue
-
-Implementation of LIFO queue with json serializable data on top of Redis
-
-```python
-import redis
-from pcg import RedisLifoQueue
 
 
 def redis_lifo_queue():
@@ -137,17 +93,6 @@ def redis_lifo_queue():
     db.delete("rdt:lifo-queue")
 
 
-redis_lifo_queue()
-```
-
-# RedisUniqueQueue 
-
-Combination of redis list and set
-
-```python
-import redis
-from rdt import RedisUniqueQueue
-
 def redis_unique_queue():
     db = redis.from_url("redis://localhost:6379/15")
     q = RedisUniqueQueue(
@@ -172,5 +117,8 @@ def redis_unique_queue():
     db.delete("rdt:unique-queue:filter")
 
 
-redis_unique_queue()
-```
+if __name__ == "__main__":
+    redis_set_filter()
+    redis_bucket_filter()
+    redis_lifo_queue()
+    redis_unique_queue()
