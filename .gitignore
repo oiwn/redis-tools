@@ -129,4 +129,6 @@ dmypy.json
 .pyre/
 
 # project
+codecov
+coverage.xml
 .tmuxp.yaml

@@ -1,7 +1,7 @@
 # redis-tools
 Various tools to simplify common use cases
 
-[![codecov](https://codecov.io/gh/oiwn/redis-tools/branch/master/graph/badge.svg)](https://codecov.io/gh/oiwn/redis-tools)
+[![codecov](https://codecov.io/gh/oiwn/redis-tools/branch/main/graph/badge.svg?token=DV858BK2UL)](https://codecov.io/gh/oiwn/redis-tools)
 
 
 Helpers and stuff for building web crawlers.

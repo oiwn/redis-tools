@@ -10,3 +10,4 @@
   - [X] basic benchmarks
   - [ ] rename RedisSetFilter to RedisFilter
   - [X] add examples to README.md
+  - [X] setup coverage
