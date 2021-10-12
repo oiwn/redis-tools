@@ -11,3 +11,5 @@
   - [ ] rename RedisSetFilter to RedisFilter
   - [X] add examples to README.md
   - [X] setup coverage
+  - [ ] adopt https://hypothesis.readthedocs.io/en/latest/
+  - [ ] Add queue with bloom filter
