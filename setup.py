@@ -13,11 +13,11 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="redis-tools",
-    version="0.0.5",
+    version="0.0.6",
     author="oiwn",
     author_email="",
     description=(
-        "Various tools to simplify common use cases for redis in web-scraping"
+        "Various tools to simplify common use-cases for redis in web-scraping"
     ),
     long_description=long_description,
     long_description_content_type="text/markdown",
