@@ -1,8 +1,8 @@
 """Different types of queues for redis"""
-from typing import List, Dict, Optional
+import typing as t
 
 import redis
-from rdt.serializers import ItemSerializer
+from rdt.serializers import BaseSerializer, JsonItemSerializer
 
 
 class RedisLifoQueue:
@@ -14,13 +14,15 @@ class RedisLifoQueue:
         "name",
     ]
 
+    __serializer: BaseSerializer
+
     @property
     def db(self) -> redis.client.Redis:
         """Getter for database client"""
         return self.__db
 
     @property
-    def serializer(self) -> ItemSerializer:
+    def serializer(self) -> BaseSerializer:
         """Current serializer
 
         :returns: ItemSerializer -- current serializer instance
@@ -28,7 +30,10 @@ class RedisLifoQueue:
         return self.__serializer
 
     def __init__(
-        self, name: str, r: redis.client.Redis, serializer: str = "json"
+        self,
+        name: str,
+        r: redis.client.Redis,
+        serializer: BaseSerializer = JsonItemSerializer,
     ):
         """Trivial LIFO redis queue implementation,
         store data as serialized json
@@ -38,7 +43,7 @@ class RedisLifoQueue:
         :serializer str: string representation of json library
         """
         self.__db = r
-        self.__serializer = ItemSerializer(serializer)
+        self.__serializer = serializer()
         self.name = name
 
     def is_empty(self) -> bool:
@@ -64,7 +69,7 @@ class RedisLifoQueue:
         """
         return int(self.db.rpush(self.name, self.serializer.dumps(item)))
 
-    def put_bulk(self, items: List[dict]) -> bool:
+    def put_bulk(self, items: t.List[t.Dict]) -> bool:
         """Use redis pipelines to push bulk into the queue
         :param items: list of serializables to push into the queue
         :returns: bool - if return fit number of items in queue
@@ -74,9 +79,9 @@ class RedisLifoQueue:
             pipe.rpush(self.name, self.serializer.dumps(item))
         res = pipe.execute()
         # last result contains len of queue after operations
-        return bool(res[-1] == self.__len__())
+        return bool(res[-1] == len(self))
 
-    def get(self) -> Optional[Dict]:
+    def get(self) -> t.Optional[t.Dict]:
         """Pop first element from the list
         :returns: dict - serialized item
         """
@@ -85,7 +90,7 @@ class RedisLifoQueue:
             return None
         return dict(self.serializer.loads(item))
 
-    def get_block(self, timeout=None) -> Optional[Dict]:
+    def get_block(self, timeout=None) -> t.Optional[t.Dict]:
         """Pop item from the queue.
 
         If optional args block is true and timeout is None (the default), block
@@ -96,7 +101,7 @@ class RedisLifoQueue:
             return dict(self.serializer.loads(item[1]))
         return None
 
-    def get_bulk(self, number_of_items) -> List[dict]:
+    def get_bulk(self, number_of_items) -> t.List[t.Dict]:
         """Remove and return part of list from queue"""
         items_list = []
         for _ in range(number_of_items):
@@ -108,12 +113,15 @@ class RedisLifoQueue:
                 break
         return items_list
 
-    def sizeof(self) -> Optional[int]:
+    def sizeof(self) -> t.Optional[int]:
         """Size of data structure in redis
 
         :returns: int -- memory used in bytes
         """
-        return self.db.memory_usage(self.name, samples=0)
+        mem_usage = self.db.memory_usage(self.name, samples=0)
+        if mem_usage is not None:
+            return int(mem_usage)
+        return None
 
     def __len__(self) -> int:
         """Queue length.

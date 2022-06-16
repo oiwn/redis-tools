@@ -4,18 +4,34 @@
 import json
 import bson
 import pytest
-from rdt.serializers import ItemSerializer
+from rdt.serializers import (
+    StrItemSerializer,
+    BaseJsonItemSerializer,
+    JsonItemSerializer,
+    BsonItemSerializer,
+)
 
 
-def test_item_serializer():
+def test_base_serializer():
     # raise serializer lib if not supported
     with pytest.raises(AssertionError):
-        ItemSerializer(serializer="musson")
+        BaseJsonItemSerializer()
 
-    s = ItemSerializer()  # use standard json serializer
+
+def test_str_serializer():
+    s = StrItemSerializer()
+
+    assert s.serializer_name == "str"
+
+    assert s.loads("value") == "value"
+    assert s.dumps("value") == "value"
+
+
+def test_json_serializer():
+    s = JsonItemSerializer()  # use stdlib json serializer
 
     # check serializer
-    assert s.serializer == "json"
+    assert s.serializer_name == "json"
 
     # check functons type
     assert s._loads is json.loads
@@ -27,11 +43,13 @@ def test_item_serializer():
 
     del s
 
+
+def test_bson_serializer():
     # special cases
-    s = ItemSerializer(serializer="bson")
+    s = BsonItemSerializer()
 
     # check serializer
-    assert s.serializer == "bson"
+    assert s.serializer_name == "bson"
 
     # check functions type
     assert s._loads.__name__ == bson.BSON.decode.__name__

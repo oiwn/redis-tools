@@ -1,13 +1,14 @@
 """Unique queue implementation"""
-import operator
-from typing import List, Dict, Optional, Callable, Union, Any
-import redis
+# pylint: disable=consider-using-f-string
+#  import operator
+import typing as t
 
-from rdt.serializers import ItemSerializer
+import redis
+from rdt.serializers import BaseSerializer, JsonItemSerializer
 
 
 # operator to get same element
-Same = lambda x: x
+Same = lambda x: x  # pylint: disable=unnecessary-lambda-assignment
 
 
 class RedisUniqueQueue:
@@ -21,13 +22,15 @@ class RedisUniqueQueue:
         "keygetter",
     ]
 
+    __serializer: BaseSerializer
+
     @property
     def db(self) -> redis.client.Redis:
         """Getter for database client"""
         return self.__db
 
     @property
-    def serializer(self) -> ItemSerializer:
+    def serializer(self) -> BaseSerializer:
         """Current serializer
 
         :returns: ItemSerializer -- current serializer instance
@@ -36,10 +39,10 @@ class RedisUniqueQueue:
 
     def __init__(
         self,
-        name: Union[str, Dict[str, str]],
+        name: t.Union[str, t.Dict[str, str]],
         r: redis.client.Redis,
-        serializer: str = "json",
-        keygetter: Callable[[Dict], Any] = Same,
+        serializer: BaseSerializer = JsonItemSerializer,
+        keygetter: t.Callable[[t.Dict], t.Any] = Same,
     ):
         """Trivial LIFO redis queue implementation, with filtering
         store data as serialized json
@@ -53,7 +56,7 @@ class RedisUniqueQueue:
             element
         """
         self.__db = r
-        self.__serializer = ItemSerializer(serializer)
+        self.__serializer = serializer()
 
         # define names for queue and filter
         if isinstance(name, dict):
@@ -75,12 +78,14 @@ class RedisUniqueQueue:
         """
         return len(self) == 0
 
-    def in_filter(self, value: Dict) -> bool:
+    def in_filter(self, value: t.Dict) -> bool:
         """Check if element already in filter"""
         key = self.keygetter(value)
         return bool(self.db.sismember(self.filter_name, key))
 
-    def put(self, item: Dict) -> int:  # TODO: define item type (int, str, etc)
+    def put(
+        self, item: t.Dict
+    ) -> int:  # TODO: define item type (int, str, etc)
         """Put item into the queue.
 
         :param item: serializable item to push into the queue
@@ -99,7 +104,7 @@ class RedisUniqueQueue:
         # last result contains len of queue after operations
         return int(res[-1])
 
-    def put_bulk(self, items: List[Dict]) -> bool:
+    def put_bulk(self, items: t.List[t.Dict]) -> bool:
         """Use redis pipelines to push bulk into the queue
         :param items: list of serializables to push into the queue
         :returns: bool - if return fit number of items in queue
@@ -117,7 +122,7 @@ class RedisUniqueQueue:
         # last result contains len of queue after operations
         return bool(res[-1] == self.__len__())
 
-    def get(self) -> Any:  # define type
+    def get(self) -> t.Any:  # define type
         """Pop first element from the list
         :returns: dict - serialized item
         """
@@ -126,7 +131,7 @@ class RedisUniqueQueue:
             return None
         return self.serializer.loads(item)
 
-    def get_block(self, timeout=None) -> Optional[Dict]:
+    def get_block(self, timeout=None) -> t.Optional[t.Dict]:
         """Pop item from the queue.
 
         If optional args block is true and timeout is None (the default), block
@@ -137,7 +142,7 @@ class RedisUniqueQueue:
             return dict(self.serializer.loads(item[1]))
         return None
 
-    def get_bulk(self, number_of_items) -> List[Any]:
+    def get_bulk(self, number_of_items) -> t.List[t.Any]:
         """Remove and return part of list from queue"""
         items_list = []
         for _ in range(number_of_items):

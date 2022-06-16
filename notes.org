@@ -4,12 +4,14 @@
   - [X] default itemgetter for unique_queue
   - [X] itemgetter could be None, if so use default (RedisUniqueQueue)
   - [X] fix error for RedisUniqueQueue when all put_bulk items already in filter
-  - [ ] replace default keygetter to return same element by default
+  - [X] replace default keygetter to return same element by default
   - [ ] ABC for queues
-  - [ ] RedisUniqueQueue able to define names of filter and queue separately
+  - [X] RedisUniqueQueue able to define names of filter and queue separately
   - [X] basic benchmarks
-  - [ ] rename RedisSetFilter to RedisFilter
+  - [X] rename RedisSetFilter to RedisFilter
   - [X] add examples to README.md
   - [X] setup coverage
   - [ ] adopt https://hypothesis.readthedocs.io/en/latest/
   - [ ] Add queue with bloom filter
+  - [X] better serializersA
+  - [X] serialize into plain str

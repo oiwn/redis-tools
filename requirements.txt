@@ -1,4 +1,4 @@
 mmh3
-bson
+pymongo
 redis
 redisbloom
